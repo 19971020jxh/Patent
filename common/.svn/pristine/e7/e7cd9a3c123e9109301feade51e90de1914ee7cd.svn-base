@@ -1,0 +1,253 @@
+package cn.edu.patent.lucene;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.List;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.LongPoint;
+import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+
+import cn.edu.patent.pojo.patent;
+
+
+/**
+ * @author:JXH
+ * @date:2019年4月7日-上午9:50:22
+ */
+public class luceneUtil {
+	/**
+	 * 默认搜索域
+	 */
+	@Value("#{'${lucene.searchFields}'.split(',')}")
+	public String[] fields;
+	@Value("${lucene.indexPackage}")
+	public String indexpackage;
+	@Autowired
+	@Qualifier("SmartChineseAnalyzer")
+	private  Analyzer  SmartChineseAnalyzer;
+	/**
+	 * 中文分词器,不可交给spring管理，每次用创建
+	 */
+	public IndexWriter indexWriter=null;
+		
+	    public StringField id;
+		public TextField createThing=null;
+	    public TextField requestNumber=null;
+	    public TextField publicatioNumber=null;
+	    public TextField ipc=null;
+	    public TextField createPeople=null;
+	    public TextField filingDate=null;
+	    public TextField publicationDate=null;
+	    public TextField proposer=null;
+	    public TextField priorityNumber=null;
+	    public TextField remark=null;
+	    public TextField profitRequest=null;
+	    public TextField technicalField=null;
+	    public TextField BackgroundTechnology=null;
+	    public TextField summaryInvention=null;
+	    public TextField practicalContent=null;
+	    public TextField descriptionDrawings=null;
+	    public TextField specificMethods=null;
+	    /**
+	     * insert 或 update,delete 之前调用！
+	     * @throws IOException
+	     */
+	    public void Before() throws IOException {
+	    	//判断 索引文件夹是否存在！
+	    	 File indexFile=new File(indexpackage);
+			 if (!indexFile.exists()) {
+				indexFile.mkdir();
+			 }
+	    	 Directory directory=FSDirectory.open(Paths.get(indexpackage));
+				/*创建的时候使用那种分词器，查询时也用对应的
+				 * SmartChineseAnalyzer 中文！
+				 */
+				//SmartChineseAnalyzer analyzer=new SmartChineseAnalyzer();
+				IndexWriterConfig conf=new IndexWriterConfig(SmartChineseAnalyzer);
+				/*OpenMode.CREATE 覆盖索引
+				 *OpenMode.CREATE_OR_APPEND 追加索引
+				 */
+				conf.setOpenMode(OpenMode.CREATE_OR_APPEND);
+				indexWriter=new IndexWriter(directory, conf);
+	    }
+	    /**
+	     * insert 或 update,delete 之后调用！
+	     * @throws IOException
+	     */
+	    public void After() throws IOException {
+	    	indexWriter.commit();
+	    	indexWriter.close();
+	    	indexWriter=null;
+	    }
+	    /**
+	     * 修改或更新操作，公共部分！
+	     * @param patent
+	     */
+	    public Document insertOrUpdate(patent patent) {
+		    	Document document=new Document();
+		    	// id
+		    	id=new StringField("id", String.valueOf(patent.getId()), Store.YES);
+		    	//发明名称
+		    	if (patent.getCreateThing()!=null&!patent.getCreateThing().equals("")&ArrayUtils.contains(fields,"createThing" )) {
+		    		createThing=new TextField("createThing", patent.getCreateThing(),Store.YES);
+		    	//createThing.setBoost(0);
+		    	}
+		    	//申请号
+		    	if (patent.getRequestNumber()!=null&!patent.getRequestNumber().equals("")&ArrayUtils.contains(fields,"requestNumber" )) {
+		    		requestNumber=new TextField("requestNumber", patent.getRequestNumber(),Store.YES);
+				}
+		    	//公开号 
+		    	if (patent.getPublicationNumber()!=null&&!patent.getPublicationNumber().equals("")&ArrayUtils.contains(fields,"publicatioNumber" )) {
+		    		publicatioNumber=new TextField("publicatioNumber", patent.getPublicationNumber(),Store.YES);
+				}
+		    	// ipc分类号
+		    	if (patent.getIpc()!=null&!patent.getIpc().equals("")&ArrayUtils.contains(fields,"ipc" )) {
+		    		ipc=new TextField("ipc", patent.getIpc(),Store.YES);
+				}
+		    	//发明人
+		    	if (patent.getCreatePeople()!=null&!patent.getCreatePeople().equals("")&ArrayUtils.contains(fields,"createPeople" )) {
+		    		createPeople=new TextField("createPeople", patent.getCreatePeople(),Store.YES);
+				}
+		    	//申请日
+		    	if (patent.getFilingDate()!=null&!patent.getFilingDate().equals("")&ArrayUtils.contains(fields,"filingDate" )) {
+		    		filingDate=new TextField("filingDate", patent.getFilingDate(),Store.YES);
+				}
+		    	//公开日
+		    	if (patent.getPublicationDate()!=null&!patent.getPublicationDate().equals("")&ArrayUtils.contains(fields,"publicationDate" )) {
+		    		publicationDate=new TextField("publicationDate", patent.getPublicationDate(),Store.YES);
+				}
+		    	//申请人
+		    	if (patent.getProposer()!=null&!patent.getProposer().equals("")&ArrayUtils.contains(fields,"proposer" )) {
+		    		proposer=new TextField("proposer", patent.getProposer(),Store.YES);
+				}
+		    	//优先权号
+		    	if (patent.getPriorityNumber()!=null&!patent.getPriorityNumber().equals("")&ArrayUtils.contains(fields,"priorityNumber" )) {
+		    		priorityNumber=new TextField("priorityNumber", patent.getPriorityNumber(),Store.YES);
+				}
+		    	//摘要
+		    	if(patent.getRemark()!=null&ArrayUtils.contains(fields,"remark" )) {
+		    		 String remarkString="";
+		    		 List<String> list=patent.getRemark();
+		    		 int length=list.size();
+		 	    	for(int i=0;i<length;i++) {
+		 	    		if (i!=length-1) {
+		 	    			remarkString=remarkString+list.get(i)+"$";//分隔符！
+						}else {
+							remarkString=remarkString+list.get(i);
+						}
+		 	    		
+		 	    	}
+		 	    	remark=new TextField("remark", remarkString, Store.YES);
+		    	}
+		    	// 权利要求书
+		        if (patent.getProfitRequest()!=null&ArrayUtils.contains(fields,"profitRequest" )) {
+		        	String profitRequestString="";
+		        	List<String> list2=patent.getProfitRequest();
+		        	int length=list2.size();
+			    	for(int i=0;i<length;i++) {
+			    		if (i!=length-1) {
+			    			profitRequestString=profitRequestString+list2.get(i)+"$";
+						}else {
+							profitRequestString=profitRequestString+list2.get(i);
+						}
+			    		
+			    	}
+			    	profitRequest=new TextField("profitRequest", profitRequestString, Store.YES);
+				}
+		    	//技术领域
+		    	if (patent.getTechnicalField()!=null&!patent.getTechnicalField().equals("")&ArrayUtils.contains(fields,"technicalField" )) {
+		    		technicalField=new TextField("technicalField", patent.getTechnicalField(), Store.YES);
+				}
+		    	// 背景技术
+		    	if (patent.getBackgroundTechnology()!=null&!patent.getBackgroundTechnology().equals("")&ArrayUtils.contains(fields,"BackgroundTechnology" )) {
+		    		BackgroundTechnology=new TextField("BackgroundTechnology", patent.getBackgroundTechnology(), Store.YES);
+				}
+		    	//发明内容
+		    	if (patent.getSummaryInvention()!=null&!patent.getSummaryInvention().equals("")&ArrayUtils.contains(fields,"summaryInvention" )) {
+		    		summaryInvention=new TextField("summaryInvention", patent.getSummaryInvention(), Store.YES);
+				}
+		    	//实用新型内容
+		    	if (patent.getPracticalContent()!=null&! patent.getPracticalContent().equals("")&ArrayUtils.contains(fields,"practicalContent" )) {
+		    		practicalContent=new TextField("practicalContent", patent.getPracticalContent(), Store.YES);
+				}
+		    	//附图说明
+		    	if (patent.getDescriptionDrawings()!=null&!patent.getDescriptionDrawings().equals("")&ArrayUtils.contains(fields,"descriptionDrawings" )) {
+		    		descriptionDrawings=new TextField("descriptionDrawings", patent.getDescriptionDrawings(), Store.YES);
+				}
+		    	//具体实施方式
+		    	if (patent.getSpecificMethods()!=null&!patent.getSpecificMethods().equals("")&ArrayUtils.contains(fields,"specificMethods" )) {
+		    		specificMethods=new TextField("specificMethods", patent.getSpecificMethods(), Store.YES);
+		    		
+				}
+		    	document.add(id);
+		        if (createThing!=null) {
+		        	document.add(createThing);
+				}
+		    	if (requestNumber!=null) {
+		    		document.add(requestNumber);
+				}
+		    	if (publicatioNumber!=null) {
+		    		document.add(publicatioNumber);
+				}
+		    	if (ipc!=null) {
+		    		document.add(ipc);
+				}
+		    	if (createPeople!=null) {
+		    		document.add(createPeople);
+				}
+		    	if (filingDate!=null) {
+		    		document.add(filingDate);
+				}
+		    	if (publicationDate!=null) {
+		    		document.add(publicationDate);
+				}
+		    	if (proposer!=null) {
+		    		document.add(proposer);
+				}
+		    	if (priorityNumber!=null) {
+		    		document.add(priorityNumber);
+				}
+		    	if (remark!=null) {
+		    		document.add(remark);
+				}
+		    	if (profitRequest!=null) {
+		    		document.add(profitRequest);
+				}
+		    	if (technicalField!=null) {
+		    		document.add(technicalField);
+				}
+		    	if (BackgroundTechnology!=null) {
+		    		document.add(BackgroundTechnology);
+				}
+		    	if (summaryInvention!=null) {
+		    		document.add(summaryInvention);
+				}
+		    	if (practicalContent!=null) {
+		    		document.add(practicalContent);
+				}
+		    	if (descriptionDrawings!=null) {
+		    		document.add(descriptionDrawings);
+				}
+		    	if (specificMethods!=null) {
+		    		document.add(specificMethods);
+				}
+	    return document;
+	    }
+}

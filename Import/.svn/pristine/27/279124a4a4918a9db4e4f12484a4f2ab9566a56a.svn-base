@@ -1,0 +1,49 @@
+package patentImport.janalyze2;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.springframework.stereotype.Component;
+
+import cn.edu.patent.pojo.patent;
+import patentImport.util.DocumentUtil;
+
+
+/**
+ * @author:JXH
+ * @date:2019年3月26日-下午2:20:22
+ * Abstract.html文件的解析！
+ */
+@Component
+public class AbstractHtml extends DocumentUtil implements janalyze{
+	
+	  public static String targetfileString="Abstract.html";
+  
+	  public patent  janalyzeimpl(Map<String, String> patenturl,patent patent){
+		  //这个类需要解析的文件路径
+		  String url=patenturl.get(targetfileString);
+		  File file=new File(url);
+		  try {
+		   document=	Jsoup.parse(file, "UTF-8");
+		   //属性赋值
+		   patent.setCreateThing(createThing());
+		   patent.setRequestNumber(requestNumber());
+		   patent.setPublicationNumber(publicatioNumber());
+		   patent.setIpc(ipc());
+		   patent.setCreatePeople(createPeople());
+		   patent.setFilingDate(filingDate());
+		   patent.setPublicationDate(publicationDate());
+		   patent.setProposer(proposer());
+		   patent.setPriorityNumber(priorityNumber());
+		   patent.setRemark(remark());
+		   
+		  } catch (IOException e) {
+			e.printStackTrace();
+		  }
+		  
+		  return patent;
+	  }
+}

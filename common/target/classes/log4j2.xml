@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration>
+
+   <CustomLevels>
+            <CustomLevel name="work" intLevel="99" />
+   </CustomLevels>
+  
+    <Appenders>
+    	
+        <!--这个输出控制台的配置，这里输出除了warn和error级别的信息到System.out-->
+        <Console name="console_out_appender" target="SYSTEM_OUT">
+        	
+            <!-- 输出日志的格式 -->
+            <PatternLayout pattern="%5p [%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- 配置日志的根节点 -->
+        <root>
+            <appender-ref ref="console_out_appender"  />
+        </root>
+        <Logger name="cn.edu.patent.dao.jkeep3" level="DEBUG" additivity="false">
+         <AppenderRef ref="console_out_appender"/>
+        </Logger>
+        
+    </Loggers>
+
+</Configuration>

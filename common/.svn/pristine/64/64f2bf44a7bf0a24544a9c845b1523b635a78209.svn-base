@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.patent.dao.jkeep3.patentKeep">
+<resultMap id="patent" type="cn.edu.patent.pojo.patent" >
+<id  column="id" property="id" ></id>	
+<result column="request_number" property="requestNumber" ></result>
+<result column="create_thing" property="createThing" ></result>
+<result column="publicatio_number" property="publicatioNumber" ></result>
+<result column="ipc" property="ipc" ></result>
+<result column="create_people" property="createPeople" ></result>
+<result column="filing_date" property="filingDate" ></result>
+<result column="publication_date" property="publicationDate" ></result>
+<result column="proposer" property="proposer" ></result>
+<result column="priority_number" property="priorityNumber" ></result>
+<result column="remark" property="remark" typeHandler="cn.edu.patent.util.LisStringHandler" javaType="java.util.List" jdbcType="VARCHAR" ></result>
+<result column="profit_request" property="profitRequest" typeHandler="cn.edu.patent.util.LisStringHandler" javaType="java.util.List" jdbcType="VARCHAR"></result>
+<result column="technical_field" property="technicalField" ></result>
+<result column="background_technology" property="backgroundTechnology" ></result>
+<result column="summary_invention" property="summaryInvention" ></result>
+<result column="practicalContent" property="practical_content" ></result>
+<result column="description_drawings" property="descriptionDrawings" ></result>
+<result column="specific_methods" property="specificMethods" ></result>
+
+</resultMap>
+	
+<insert id="insert_patent" parameterType="cn.edu.patent.pojo.patent" useGeneratedKeys="true" keyProperty="id" keyColumn="id" >
+insert into patent
+(
+create_thing,
+request_number,
+publication_number,
+ipc,
+create_people,
+filing_date,
+publication_date,
+proposer,
+priority_number,
+remark,
+profit_request,
+technical_field,
+background_technology,
+summary_invention,
+practical_content,
+description_drawings,
+specific_methods
+)
+values(
+#{createThing},
+#{requestNumber},
+#{publicationNumber},
+#{ipc},
+#{createPeople},
+#{filingDate},
+#{publicationDate},
+#{proposer},
+#{priorityNumber},
+#{remark,jdbcType=VARCHAR,javaType=java.util.List},
+#{profitRequest,jdbcType=VARCHAR,javaType=java.util.List},
+#{technicalField},
+#{backgroundTechnology},
+#{summaryInvention},
+#{practicalContent},
+#{descriptionDrawings},
+#{specificMethods}
+)
+</insert>
+
+<select id="selectAll"  resultMap="patent">
+select * from patent
+</select>
+
+<update id="update" parameterType="cn.edu.patent.pojo.patent">
+ update  patent
+ set 
+ create_thing=#{createThing},
+ request_number=#{requestNumber},
+ publication_number=#{publicationNumber},
+ ipc=#{ipc},
+ create_people=#{createPeople},
+ filing_date=#{filingDate},
+ publication_date=#{publicationDate}, 
+ proposer=#{proposer},
+ priority_number=#{priorityNumber},
+ remark=#{remark,jdbcType=VARCHAR,javaType=java.util.List},
+ profit_request=#{profitRequest,jdbcType=VARCHAR,javaType=java.util.List},
+ technical_field=#{technicalField},
+ background_technology=#{backgroundTechnology},
+ summary_invention=#{summaryInvention},
+ practical_content=#{practicalContent},
+ description_drawings=#{descriptionDrawings},
+ specific_methods=#{specificMethods}
+ where
+ id=#{id}	
+</update>
+<delete id="delete" >
+delete from patent where id=#{id}	
+</delete>
+<select id="selectone" resultMap="patent" >
+	select * from patent where id=#{id} limit 1
+</select>
+
+<!--public Boolean exist(String requestNumber)-->
+<select id="exist" resultType="boolean" parameterType="string" >
+<![CDATA[ select count(id) from patent where request_number=#{requestNumber} ]]> 
+</select>
+</mapper>

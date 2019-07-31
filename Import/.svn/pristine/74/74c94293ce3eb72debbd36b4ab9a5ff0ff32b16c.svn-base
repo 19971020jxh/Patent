@@ -1,0 +1,86 @@
+package patentImport.jkeep3;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.logging.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import cn.edu.patent.dao.jkeep3.patentKeep;
+import cn.edu.patent.lucene.insertIndex;
+import cn.edu.patent.pojo.patent;
+import cn.edu.patent.pojo.tmp;
+import cn.edu.patent.service.insertService;
+import lombok.extern.log4j.Log4j2;
+import patentImport.janalyze2.janalyzeservice;
+import patentImport.jread1.readzip;
+
+/**
+ * @author:JXH
+ * @date:2019年3月28日-下午8:30:09
+ */
+@Log4j2
+@Repository
+public class patentKeepimpl {
+	@Autowired
+	private readzip readzip;
+	@Autowired
+	private janalyzeservice janalyzeservice;
+
+	@Autowired
+	private insertIndex insertIndex;
+	@Autowired
+	private insertService insertService;
+	
+	//@Transactional
+	/**
+	 * 如果专利保存失败了，记录这个下载失败的zip,返回给前台
+	 * @throws IOException 
+	 */
+	public Map<String, Object> insert_patents(ArrayList<patent> patents,String url) throws IOException {
+		//返回保存结果
+		Map<String, Object> resultMap=new HashMap<String, Object>();
+		//失败zip个数
+		ArrayList<String> failzip=new ArrayList<String>();
+		int success=0;
+		insertIndex.Before();
+		for(patent patent:patents) {
+			try {
+				insertService.batchOfZip(patent);
+				success++;
+			}catch (Exception e) {
+				log.log(Level.forName("work", 50), patent.getZip()+"，保存失败！");
+				//e.printStackTrace();--不能执行这句,会中断循环,导致后面的包添加失败！
+				//可以执行 e.getMessage() 这句记录异常
+				failzip.add(patent.getZip());
+			}
+		}
+        insertIndex.After();
+		resultMap.put("检测到的专利数:", patents.size());
+		resultMap.put("成功上传数据库:", success);
+		resultMap.put("保存失败的专利包:",failzip);
+		
+		return resultMap;
+	}
+	/**
+	 * 调用这个!,返回处理结果
+	 * @param path
+	 * @return
+	 * @throws IOException 
+	 */
+	public Map<String, Object> work(String path,String url) throws IOException{
+		//1.第一步解压,返回文件路径信息
+		ArrayList<Map<String, String>> listZip=readzip.result(path);
+		//2.返回专利对象
+		ArrayList<patent> patents=janalyzeservice.janalyzeimpls(listZip);
+		//3.返回处理结果!
+		Map<String, Object> result=insert_patents(patents,url);
+		return result;
+	}
+
+}

@@ -1,0 +1,122 @@
+package patentImport.jread1;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+import org.apache.logging.log4j.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+import cn.edu.patent.pojo.patent;
+import lombok.extern.log4j.Log4j2;
+import patentImport.util.zipUtil;
+
+
+/**
+ * @author:JXH
+ * @date:2019年3月26日-下午1:09:59
+ * 读取路径下的全部zip,
+ */
+@Component
+@Log4j2
+public class readzip {
+	
+	@Autowired
+	@Qualifier(value="targetFile")
+	private ArrayList<String> targetfileArrayList;
+	
+	@Autowired
+	private zipUtil zipUtil;
+	
+	/**
+	 * 输入一个路径path,获取路径下全部的zip,从zip中找出专利 <br/>
+	 * 返回ArrayList<Map<String, String>> 一个map代表一个专利
+	 * @param path
+	 * @return
+	 */
+	public ArrayList<Map<String, String>> result(String path){
+		path=zipUtil.unZip(path);//解压上传的压缩包
+		log.log(Level.forName("work", 50), "处理："+path+"路径下的文件");
+		                          //     先获取路径下全部zip,再全部解压，返回解压后的包的集合
+		ArrayList<String> zipsList=new ArrayList<String>();
+		zipUtil.allzip(path,zipsList);
+		log.log(Level.forName("work", 50),"全部专利zip:"+zipsList.toString());
+		ArrayList<String> unzipsList=zipUtil.allunzip(zipsList);
+		log.log(Level.forName("work", 50),"个数:"+unzipsList.size()+"解压出的路径下全部zip:"+unzipsList.toString());
+		return	getpatentsurl(unzipsList);
+		
+	}
+	
+	public ArrayList<Map<String, String>> resultOne(String path){
+	//	path=zipUtil.unZip(path);//解压上传的压缩包
+	//	log.log(Level.forName("work", 50), "处理："+path+"路径下的文件");
+		                          //     先获取路径下全部zip,再全部解压，返回解压后的包的集合
+		ArrayList<String> zipsList=new ArrayList<String>();
+	    zipsList.add(path);
+		log.log(Level.forName("work", 50),"全部专利zip:"+zipsList.toString());
+		ArrayList<String> unzipsList=zipUtil.allunzip(zipsList);
+		log.log(Level.forName("work", 50),"个数:"+unzipsList.size()+"解压出的路径下全部zip:"+unzipsList.toString());
+		return	getpatentsurl(unzipsList);
+		
+	}
+	
+	
+     /**
+      * 获取每个zip解压后包里符合targetFile.xml文件里要求的文件的全路径<br/>
+      * 返回一个map集合,每个map表示一个专利,map的键是符合要求的文件名,<br/>
+      * key是文件名的url  <br/>
+      * @param ArrayList<File> zipsList zip集合
+      * @return ArrayList<Map<String, String>> patents 专利map
+      * @throws IOException <br/>
+      */
+	public ArrayList<Map<String, String>> getpatentsurl(ArrayList<String> unzipsList){
+		ArrayList<Map<String, String>> patents=new ArrayList<Map<String, String>>();
+		for(String unzip:unzipsList) {
+			Map<String, String> map=new HashMap<String, String>();
+			patents.add(getfile(unzip, map));
+		}
+		return patents;
+		
+	}
+	/**
+	 * 获取包里符合要求的文件，返回map
+	 * <br/> 不递归！，
+	 * @param path
+	 * @return
+	 */
+	public Map<String, String> getfile(String path,Map<String, String> map) {
+		File file=new File(path);
+		String packagename=null;
+		
+		//System.out.println("path: "+file.getPath()+" "+file.getParent()+"name== "+file.getName());
+		File[] array=file.listFiles();
+		
+		//记录这个包属于那个zip,失败专用
+		if(!map.containsKey("zip")) {
+					map.put("zip", file.getName());
+		}
+		for(File f:array) {
+			if (f.isFile()) {
+				if (targetfileArrayList.contains(f.getName())) {
+					map.put(f.getName(), f.getPath());
+				}
+				
+			}else if (f.isDirectory()) {//递归文件夹
+				getfile(f.getPath(),map);
+			}
+		}
+	//	log.log(Level.forName("work", 50),file.getName()+"的文件信息:"+map.toString());
+		return map;
+	}
+}

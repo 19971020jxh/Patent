@@ -1,0 +1,16 @@
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/ExceptionController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/insertController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/LoginAndRegisterController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/updateController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/deleteController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/searchController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/Interceptor/LoginInterceptor.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/patentController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/DictionaryController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/util/formTopatent.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/util/UnicodeReader.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/FileUploadController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/config/MvcConfig.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/EncodingControlleradvice.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/controller/adminController.java
+/home/jxh/hebei/Patent/web/src/main/java/patentweb/Interceptor/FileUploadInterceptor.java

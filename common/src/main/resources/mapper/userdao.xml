@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.patent.dao.jkeep3.userdao">
+<!--   Boolean login(@Param("name")String name,@Param("password")String password)-->
+<select  id="login" resultType="cn.edu.patent.pojo.user" >
+<!--	<![CDATA[ select count(id) from user where name=#{name} and password=#{password}]]>-->
+select * from user where name=#{name} and password=#{password}
+</select>
+
+<select  id="exist" resultType="boolean" >
+<![CDATA[ select count(id) from user where name=#{name} ]]>
+</select>
+         
+<!--   void register(@Param("user")user user)-->
+<insert id="register"  useGeneratedKeys="true" keyProperty="id" parameterType="cn.edu.patent.pojo.user" >
+	insert into user(name,password,isroot,can_use) values(#{user.name},#{user.password},#{user.isroot},#{user.canUse})
+</insert>
+
+<!--void delete(@Param("name")String name,@Param("password")String password)-->
+<delete id="delete" >
+	delete from user where name=#{name} and password=#{password}
+</delete>
+<update id="update"> 
+update	user set name=#{name} , password=#{password} where name=#{lname} and password=#{lpassword}
+</update>
+
+<resultMap id="echarts_rg" type="java.util.HashMap" >
+	<result column="name" property="name"></result>
+	<result column="name" property="name"></result>
+</resultMap>
+
+<select id="echarts_renG" resultMap="echarts_rg" >
+<!--	select patent_type as name,count(patent_type) as value from  patent group by patent_typ-->
+select 
+	ifnull(patent_type,'未分类') as name,  
+	count(ifnull(patent_type,'未分类')) as value 
+	from patent 
+	group by 
+	ifnull(patent_type,'未分类')
+</select>
+
+<resultMap id="jsTree" type="java.util.HashMap" >
+	<result column="id" property="id"></result>
+	<result column="parent" property="parent"></result>
+	<result column="text" property="text"></result>
+</resultMap>
+<select id="jsTree" resultMap="jsTree">
+	select 
+	distinct ipc as id ,
+	substr(ipc,1,instr(ipc,'/')-1) as parent,
+	ipc as text 
+	from patent 
+	union 
+	select distinct substr(ipc,1,instr(ipc,'/')-1) as id,
+	'#' as parent,
+	concat(substr(ipc,1,instr(ipc,'/')-1),'-类别') as text
+    from patent
+</select>
+
+<select id="find_user_table" resultType="cn.edu.patent.pojo.user" >
+	select * from user where isroot=0 limit ${page},#{l} 
+</select>
+<select id="find_root_table" resultType="cn.edu.patent.pojo.user" >
+	select * from user where isroot=1 
+</select>
+
+<resultMap id="generalViewMap" type="java.util.HashMap" >
+	<result column="patentNumber" property="patentNumber" ></result>
+	<result column="ipcNumber" property="ipcNumber" ></result>
+	<result column="userNumber" property="userNumber" ></result>
+	<result column="downCounts" property="downCounts" ></result>
+</resultMap>
+<select id="generalView" resultMap="generalViewMap" >
+	select 
+	count(distinct a.id) as patentNumber,
+	count(distinct a.ipc) as ipcNumber,
+	count(distinct b.id) as userNumber,
+	round(sum(b.down_count)/count(distinct a.id),0) as downCounts,
+	count(distinct a.patent_type) as patentTypes   
+	from 
+	patent a ,`user` b
+</select>
+
+<!-- void updateLastTime(@Param("id")int id)-->
+<update id="updateLastTime"  parameterType="_int" >
+	update user set last_time=now() where id=#{id}
+</update>
+<!-- void addOneUp(@Param("id")int id)-->
+<update id="addOneUp"   > 
+	update user set upload_count=upload_count+1 where id=#{id}
+</update>
+<!-- void addOneDown(@Param("id")int id)-->
+<update id="addOneDown" >
+	update user set down_count=down_count+1 where id=#{id}
+</update>
+<!--void shiro(@Param("id")int id)-->
+<update id="shiro"  >
+	update user set can_use=abs(can_use-1) where id=#{id}
+</update>
+</mapper>

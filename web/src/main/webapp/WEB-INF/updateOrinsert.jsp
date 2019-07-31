@@ -1,0 +1,339 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+<c:if test="${url=='update' }">
+${patent.createThing }-修改！
+</c:if>
+<c:if test="${url=='insertbyself' }">
+-创建！
+</c:if>
+</title>
+<link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="static/layui/css/layui.css">
+ 
+<style type="text/css">
+body{
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+}
+h2{
+margin-top:5px;
+}
+.blockquote {
+    padding: 10px 20px;
+    margin: 0 0 20px;
+    font-size: 17.5px;
+    border-left: 5px solid #eee;
+}
+.row:hover .blockquote{
+color: #5bc0de;
+}
+.blockquote {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 15px;
+    margin-inline-end: 40px;
+}
+textarea{
+font-size:16px; 
+line-height:1.5;
+}
+</style>
+</head>
+
+<body>
+<div class="container" style="margin-top:45px;margin-bottom:45px;"> 
+
+<spring:form id="form" modelAttribute="patent" action="${url} "  method="post">
+<input type="hidden" name="id" value="${patent.id }" />
+<h2>
+<label>发明名称：</label>
+<input class="form-control" type="text" name="createThing" 
+<c:if test="${not empty patent.createThing }">
+value="${patent.createThing}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="createThing"></spring:errors>
+</h2>
+
+<table style="margin-top:15px;"  width='100%' border='0' cellpadding='0' cellspacing='1' bgcolor='#cccccc' style='font-size:14px;'>
+<tr>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>申请号<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input class="form-control" type="text" name="requestNumber" style="margin-bottom:5px;"
+<c:if test="${not empty patent.requestNumber }">
+value="${patent.requestNumber}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="requestNumber"></spring:errors>
+</td>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>申请日<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input id="dateinput1" class="form-control" type="text" name="filingDate" style="margin-bottom:5px;"
+<c:if test="${not empty patent.filingDate }">
+value="${patent.filingDate}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="filingDate"></spring:errors>
+</td>
+<tr>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>公开（公告）号<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input class="form-control" type="text" name="publicationNumber" style="margin-bottom:5px;"
+<c:if test="${not empty patent.publicationNumber }">
+value="${patent.publicationNumber}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="publicationNumber"></spring:errors>
+</td>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>公开（公告）日<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input id="dateinput2" class="form-control" type="text" name="publicationDate" style="margin-bottom:5px;"
+<c:if test="${not empty patent.publicationDate }">
+value="${patent.publicationDate}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="publicationDate"></spring:errors>
+</td>
+<tr>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>IPC分类号<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input class="form-control" type="text" name="ipc" style="margin-bottom:5px;"
+<c:if test="${not empty patent.ipc }">
+value="${patent.ipc}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="ipc"></spring:errors>
+</td>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>申请（专利权）人<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input class="form-control" type="text" name="proposer" style="margin-bottom:5px;"
+<c:if test="${not empty patent.proposer }">
+value="${patent.proposer}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="proposer"></spring:errors>
+</td>
+<tr>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>发明人<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input  class="form-control" type="text" name="createPeople" 
+<c:if test="${not empty patent.createPeople }">
+value="${patent.createPeople}"
+</c:if>
+/>
+<spring:errors cssStyle="color:red;" path="createPeople"></spring:errors>
+</td>
+<td height='30' width='20%' bgcolor='#EFEFEF' style='padding-left:10px;'>优先权号<td>
+<td bgcolor='#FFFFFF' width='30%' style='padding-left:10px;word-wrap: break-word;break-all;'>
+<input class="form-control" type="text" name="priorityNumber" 
+<c:if test="${not empty patent.priorityNumber }">
+value="${patent.priorityNumber}"
+</c:if>
+/>
+</td>
+</table>
+
+<!--  摘要 -->
+  <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>摘要</h2></div>
+  <div class="col-md-12">
+   <textarea class="form-control" name="form_remark">
+    <c:if test="${not empty remark }">
+    ${remark }
+    </c:if>
+   </textarea>
+    <spring:errors cssStyle="color:red;" path="form_remark"></spring:errors>
+  </div>
+  </div>
+
+<!--权利要求书-->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>权利要求书</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="form_profitRequest">
+   <c:if test="${not empty profitRequest }">
+   ${profitRequest }
+   </c:if>
+  </textarea>
+   <spring:errors cssStyle="color:red;" path="profitRequest"></spring:errors>
+  </div>
+  </div>
+
+<!--技术领域-->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>技术领域</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="technicalField">
+   <c:if test="${not empty patent.technicalField }">
+   ${patent.technicalField }
+   </c:if>
+  </textarea>
+  <spring:errors cssStyle="color:red;" path="technicalField"></spring:errors>
+  </div>
+  </div>
+<!--背景技术-->                  
+  <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>背景技术</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="backgroundTechnology">
+   <c:if test="${not empty patent.backgroundTechnology }">
+   ${patent.backgroundTechnology }
+   </c:if>
+  </textarea>
+  <spring:errors cssStyle="color:red;" path="backgroundTechnology"></spring:errors>
+  </div>
+  </div>
+<!--发明内容-->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>发明内容</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="summaryInvention">
+  <c:if test="${not empty patent.summaryInvention }">
+   ${patent.summaryInvention }
+   </c:if>
+  </textarea>
+  <spring:errors cssStyle="color:red;" path="summaryInvention"></spring:errors>
+  </div>
+  </div>
+<!-- 实用新型内容 -->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>实用新型内容</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="practicalContent">
+   <c:if test="${not empty patent.practicalContent }">
+   ${patent.practicalContent } 
+   </c:if>
+  </textarea>
+  </div>
+  </div>
+<!-- 附图说明 -->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>附图说明</h2></div>
+  <div class="col-md-12">
+   <textarea class="form-control" name="descriptionDrawings">
+   <c:if test="${not empty patent.descriptionDrawings }">
+   ${patent.descriptionDrawings }
+   </c:if>
+  </textarea>
+  </div>
+  </div>
+<!--具体实施方式-->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>具体实施方式</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="specificMethods">
+  <c:if test="${not empty patent.specificMethods }">
+   ${patent.specificMethods }
+   </c:if>
+  </textarea>
+  </div>
+ </div>
+<!--专利类别-->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>专利类别</h2></div>
+  <div class="col-md-12">
+  <div class="form-group">
+  <div class="col-md-2" >
+  <label for="name" style="margin-top: 5px;" >
+      <span>当前分类: </span>
+  </label>
+   <span id="patentType-hide" style="margin-left:15px;" > 
+	  <c:if test="${not empty patent.patentType}">
+	   ${patent.patentType}
+	  </c:if> 
+	  </span>
+  </div>
+   <div class="col-md-10" >
+  <select id="patentType-select" class="form-control" name="patentType" >
+      <option></option>
+    <c:forEach items="${patentType }" var="type" >
+      <option value="${type['patentClass']}">${type['patentClass']}</option>
+    </c:forEach>    
+  </select>
+  </div>
+  </div>
+  </div>
+ </div> 
+
+<!--改善-->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>改善</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="better">
+  <c:if test="${not empty patent.better }">
+   ${patent.better }
+   </c:if>
+  </textarea>
+  </div>
+ </div>
+<!--恶化-->
+ <div class="row" style="margin-top:45px;">
+  <div class="blockquote"><h2>恶化</h2></div>
+  <div class="col-md-12">
+  <textarea class="form-control" name="worsen">
+  <c:if test="${not empty patent.worsen }">
+   ${patent.worsen }
+   </c:if>
+  </textarea>
+  </div>
+ </div>
+  
+<div class="row" style="margin-top:45px;">
+ <div class="col-md-12">
+ <input  class="form-control btn-info" type="button" value="提交" onclick="mit()">
+ </div>
+  </div>
+</spring:form>
+</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.4.0/jquery.min.js"></script>
+<script src="static/layui/layui.all.js"></script>
+<script type="text/javascript">
+function mit(){
+	//除去首尾空格！
+	$('input').each(function(){
+		$(this).val($.trim($(this).val()));
+	});
+	$('textarea').each(function(){
+		var l=$.trim($(this).val());
+		$(this).val(l);
+	});
+	
+	$('#form').submit();
+}
+$(function(){
+	//初始化-专利分类.
+	var text=$('#patentType-hide').text();
+	$('#patentType-select').find("option:contains('"+text.trim()+"')").attr("selected",true);
+});
+$(document).ready(function () {
+	  $('textarea').each(function () {
+	    this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;overflow-y:hidden;');
+	  }).on('input', function () {
+	    this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px';
+	  });
+	  layui.use('laydate', function(){
+		  var laydate = layui.laydate;
+		  
+		  //常规用法
+		  laydate.render({
+		    elem:'#dateinput1'
+		  });
+		  laydate.render({
+			    elem:'#dateinput2'
+			  });
+	});	
+	 $('#dateinput1').attr('value',$('#dateinput1').attr('value').split('.').join('-'));
+	 $('#dateinput2').attr('value',$('#dateinput2').attr('value').split('.').join('-'));
+	});
+</script>
+</html>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                        http://www.springframework.org/schema/context  
+                        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                        http://www.springframework.org/schema/p  
+                        http://www.springframework.org/schema/p/spring-p-4.3.xsd">
+   <context:component-scan base-package="patentImport.jread1,patentImport.janalyze2,patentImport.jkeep3,patentImport.util">
+   </context:component-scan> 
+   <bean id="targetFile" class="java.util.ArrayList">
+     <!-- 目标解析的文件集合 -->
+     <constructor-arg>
+      <list>
+       <value>Abstract.html</value>
+       <value>Full text.html</value>
+      </list>
+     </constructor-arg>
+   </bean>
+    
+    
+    
+</beans>  

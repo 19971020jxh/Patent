@@ -1,0 +1,111 @@
+<%@ page language="java" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>专利搜索.</title>
+    <script src="http://www.jq22.com/jquery/1.11.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="static/layui/css/layui.css">
+  <style>
+    body{margin: 10px;}
+    .demo-carousel{height: 200px; line-height: 200px; text-align: center;}
+    .layui-inline{ border: none!important; }
+    .layui-icon-edit{
+    	display: none!important;    
+    }
+    .layui-icon-delete,.layui-icon-add-1{
+    	border: 1px solid #999999;
+    }
+    .layui-icon-delete{
+    	margin-left: -50px;
+    }
+    .layui-table-cell{
+    height:auto;
+    white-space: normal;
+    }
+    .layui-table td, .layui-table th, .layui-table-col-set, .layui-table-fixed-r, .layui-table-grid-down, .layui-table-header, .layui-table-page, .layui-table-tips-main, .layui-table-tool, .layui-table-total, .layui-table-view, .layui-table[lay-skin=line], .layui-table[lay-skin=row]{
+    border-width:0px;
+    border-style:none;
+    border-color:transparent;
+    }
+    .layui-table-header{
+    display:none;
+    }
+     tr{
+     display:block;
+     margin-bottom:15px;
+     margin-top:15px;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-container" style="margin-top:45px;padding-bottom:15px;">
+<div class="layui-row">
+<div class="layui-input-inline">
+<input id="what" type="text" placeholder="请输入关键词！" class="layui-input" />
+</div>
+<div class="layui-input-inline">
+<button onclick="search()" class="layui-btn layui-btn-normal">🔍<span>搜索</span></button>
+</div>
+<div class="layui-input-inline" style="float:right;">
+<a class="layui-btn" href="insertpage" >➕<span>添加</span></a>
+</div>
+</div>
+<!--表格信息渲染-->
+<table class="layui-hide" id="search-result" lay-filter="test"></table>
+
+
+</div>
+</body>
+ <!--右侧操作工具-->
+<script type="text/html" id="barTool">
+<button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="detail" onclick="patentpage(this)" >详情</button>
+</script>
+
+<script src="static/layui/layui.all.js"></script>
+<script>
+function patentpage(obj){
+	var id=$(obj).parents('td').prev().find('.patent-div').attr('patent-id');
+	window.open('patent?id='+id);
+}
+function search(){
+	layui.use([ 'laypage', 'layer', 'table', 'carousel', 'upload', 'element', 'slider'], function(){
+		   var laypage = layui.laypage //分页
+		  ,layer = layui.layer //弹层
+		  ,table = layui.table //表格
+		  ,upload = layui.upload //上传
+		  ,element = layui.element //元素操作
+		 
+
+		  //执行一个 table 实例
+		  table.render({
+		      elem: '#search-result' //表格id
+		     ,url: 'search?what='+$('#what').val() //数据接口
+		    
+		     ,limits:[5,10,15]
+		     ,limit:5
+		     ,page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+		       layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+		      ,groups: 4 //只显示 1 个连续页码
+		      ,first: false //不显示首页
+		      ,last: false //不显示尾页
+		      
+		    }
+		    ,cols: [[ //表头
+			  {field: 'div', title: '简介', width:"90%"}
+		     ,{fixed: 'right', width: 165, align:'center', toolbar: '#barTool', width:"10%"}//右侧查看，编辑操作
+		    ]]
+		  });
+
+		 /*   table.on('checkbox(test)', function(obj){
+		            console.log(obj)
+		        }); */
+
+
+		}); 
+	$('.layui-table-view').attr("style","boder-style:none");
+}
+
+</script>
+</html>

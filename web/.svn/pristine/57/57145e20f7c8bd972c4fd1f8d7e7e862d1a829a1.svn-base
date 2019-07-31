@@ -1,0 +1,36 @@
+package patentweb.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import cn.edu.patent.service.searchService;
+import patentweb.util.formTopatent;
+
+/**
+ * @author:JXH
+ * @date:2019年4月14日-下午2:25:12
+ */
+@Controller
+public class patentController {
+    @Autowired
+    private searchService searchService;
+    @Autowired
+    private formTopatent formTopatent;
+	@RequestMapping("patent")
+	public ModelAndView patent(@RequestParam("id")int id) {
+		ModelAndView modelAndView=new ModelAndView();
+		cn.edu.patent.pojo.patent patent=searchService.Selectpatent(id);
+		if(patent==null) {
+			//索引存在，但数据库并不存在的情况！
+			modelAndView.setViewName("dbNoPatent");//dbNoPatent==>数据库没有这个专利 页面
+			modelAndView.addObject("id", id);
+		}else {
+			modelAndView.setViewName("patent");
+			modelAndView.addObject("patent",formTopatent.jsp(patent));
+		}
+		return modelAndView;
+	}
+}

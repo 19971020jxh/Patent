@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.patent.dao.jkeep3.StopWordLibrary">
+
+<!--      public List<word> selectAll()-->
+   <select id="selectAll" resultType="cn.edu.patent.pojo.word" >
+   	SELECT * FROM StopWordLibrary
+   </select> 
+<!--    public List<word> selectPage(int pagenow,int limit)-->
+  <select id="selectPage"  resultType="cn.edu.patent.pojo.word" >
+<!--  	<bind name="pageNum" value="pageNow-1"></bind-->
+  	SELECT * FROM StopWordLibrary
+  	<if test="searchWhat!=null and searchWhat!=''">
+  		WHERE content LIKE CONCAT('%',#{searchWhat},'%') 
+  	</if>
+  	limit #{pageNow},#{pageSize}
+  </select>
+<!--  public int count()-->
+  <select id="count"  resultType="_int" >
+  	SELECT COUNT(id) FROM StopWordLibrary
+  </select>
+<!--      public void update(word word),IGNORE,防止重复插入-->
+     <update id="update" parameterType="cn.edu.patent.pojo.word" keyProperty="id" >
+     	UPDATE IGNORE  StopWordLibrary
+     	<set>
+     	<if test="content != null">
+     content=	#{content,jdbcType=VARCHAR,javaType=String}
+     	</if>
+     	</set>
+     	WHERE id=#{id}
+     </update>
+<!--      public void delete(String content)-->
+    <delete id="delete" parameterType="cn.edu.patent.pojo.word" >
+    	DELETE FROM StopWordLibrary WHERE id=#{id}
+    </delete>
+<!--      public void insertBatch(List<word> words)-->
+      	<insert id="insertBatch" parameterType="java.util.List" >
+      		REPLACE  INTO StopWordLibrary(content) VALUES
+      		<foreach collection="words" item="word" separator="," >
+      			(
+      			#{word.content,jdbcType=VARCHAR,javaType=String}
+      			)
+      		</foreach>
+      	</insert>
+<!--      public void insert(word word);词重复时，会替换原来的，注意如果两个词相同但属于不同类别，后来的会替换原来的，我在content上加了唯一索引-->
+ <insert id="insert" parameterType="cn.edu.patent.pojo.word" >
+ 	REPLACE  INTO StopWordLibrary(content) VALUES (#{content})
+ </insert>
+</mapper>	

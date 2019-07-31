@@ -1,0 +1,155 @@
+package cn.edu.patent.lucene;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.cn.smart.SmartChineseAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.mysql.cj.xdevapi.JsonArray;
+
+import cn.edu.patent.dao.jkeep3.patentKeep;
+import cn.edu.patent.pojo.patent;
+import cn.edu.patent.util.ApplcationUtil;
+
+/**
+ * @author:JXH
+ * @date:2019年4月5日-下午6:14:32
+ * 搜索!
+ */
+@Component
+public class searchIndex extends luceneUtil{
+	
+	
+	/*
+	 * private String[] fields1= {"createThing", "requestNumber",
+	 * "publicatioNumber", "ipc", "createPeople", "filingDate", "publicationDate",
+	 * "proposer", "priorityNumber", "remark", "profitRequest", "technicalField",
+	 * "BackgroundTechnology", "summaryInvention", "practicalContent",
+	 * "descriptionDrawings", "specificMethods"
+	 * 
+	 * };
+	 */
+	
+	
+	//@Autowired(required=false)
+	//@Qualifier("IndexSearcher")
+	private IndexSearcher searcher;
+	 /**
+	   * 搜索,不能交给spring管理,否则当我删除一个后,还能被搜到,!每次查询,new一个
+	   * @return
+	   * @throws IOException
+	   */
+	  public IndexSearcher IndexSearcher() throws IOException {
+		  Directory directory=FSDirectory.open(Paths.get(indexpackage));
+		  IndexReader reader=DirectoryReader.open(directory);
+		  IndexSearcher searcher=new IndexSearcher(reader);
+		  return searcher;
+	  }
+	/**
+	 * 注入中文分词器
+	 */
+	@Autowired
+	@Qualifier("SmartChineseAnalyzer")
+	private Analyzer SmartChineseAnalyzer;
+	public JSONObject search(String query,int pageNow,int pageSize) throws IOException, ParseException {
+		searcher=IndexSearcher();
+		//ArrayList<String> patents=new ArrayList<String>();
+		JSONObject result=new JSONObject();
+		JSONArray patents=new JSONArray();
+		 /*多字段查询
+		 * 表示多个条件之间的关系！
+		 * BooleanClause.Occur.SHOULD or
+		 * BooleanClause.Occur.MUST   and
+		 * BooleanClause.Occur.MUST_NOT not
+		 */
+	    BooleanClause.Occur[] occur=new BooleanClause.Occur[fields.length];
+	    Arrays.fill(occur, BooleanClause.Occur.SHOULD);
+		Query seQuery=MultiFieldQueryParser.parse(query,fields,occur, SmartChineseAnalyzer);
+	//	Query seQuery=new TermQuery(new Term("createThing", query)); 单域查询！
+		//TopDocs topDocs=searcher.search(seQuery,pageSize); 一次显示多少条
+		//分页查询
+		int start=(pageNow-1)*pageSize;
+		//获取上一页最后一个元素
+		ScoreDoc preDoc=null;
+		if (start>0) {
+			TopDocs lasTopDocs=searcher.search(seQuery,start);
+			preDoc=lasTopDocs.scoreDocs[start-1];
+		}
+		TopDocs topDocs=searcher.searchAfter(preDoc, seQuery, pageSize);
+		 int totalcount= topDocs.totalHits;
+		//分页查询
+		ScoreDoc[] hDocs= topDocs.scoreDocs;
+		for(ScoreDoc scoreDoc:hDocs) {
+			 Document document=searcher.doc(scoreDoc.doc);
+			// patent patent=new patent();
+			 //专利id
+			// patent.setId(Integer.parseInt(document.get("id")));
+			 //专利名称
+			// patent.setCreateThing(document.get("createThing"));
+			 //专利申请号
+			// patent.setRequestNumber(document.get("requestNumber"));
+			 //ipc分类号
+			// patent.setIpc(document.get("ipc"));
+			 //申请人
+			// patent.setProposer(document.get("proposer"));
+			 //申请日
+			// patent.setFilingDate(document.get("filingDate"));
+			 //摘要
+			// patent.setRemark(Arrays.asList(document.get("remark").split("$")));
+			 //加入结果
+			// patents.add(patent);
+			 
+			 String div="<div class='patent-div' patent-id="+document.get("id")+" style='font-size:13px;'>\n" + 
+			 		"<p class='patent-title'>\n" + 
+			 		"<span style='margin-left:2px;margin-right:2px;'>📌[发明]</span>\n" + 
+			 		"<span style='font-size:16px;'>"+document.get("createThing")+"</sapn>-<span>申请号:</span><span>"+document.get("requestNumber")+"</span>\n" + 
+			 		"</p>\n" + 
+			 		"<p style='color:#31708f;font-size:12px''>\n" + 
+			 		"<span>👤申请人：</span><span>"+document.get("proposer")+"<span>-\n" + 
+			 		"<span>📅申请日：</span><span>"+document.get("filingDate")+"<span>-\n" + 
+			 		"<span>🗄️主分类号：</span><span>"+document.get("ipc")+"<span>-\n" + 
+			 		"</p>\n" + 
+			 		"<p>\n" + 
+			 		"<span>📜摘要:</span><sapn>"+Arrays.asList(document.get("remark").split("$"))+"</sapn>\n" + 
+			 		"</p>\n" + 
+			 		"</div>";
+			 //自定义高亮
+			 div=div.replace(query,"<span style='color:#a94442;'>"+query+"</span>");
+			 JSONObject divObject=new JSONObject();
+			 divObject.put("div", div);
+			 patents.add(divObject);
+		 }
+		result.put("count", totalcount);//总记录数
+		result.put("data", patents);
+		searcher=null;
+		return result;
+	}
+	
+}

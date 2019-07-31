@@ -1,0 +1,38 @@
+package cn.edu.patent.service;
+
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import cn.edu.patent.dao.jkeep3.patentKeep;
+import cn.edu.patent.pojo.patent;
+import cn.edu.patent.util.AlibabaExcel;
+
+/**
+ * @author:JXH
+ * @date:2019年4月13日-下午4:49:17
+ * 下载Excel服务
+ * 
+ */
+@Service
+public class uploadService {
+     @Autowired
+     private patentKeep patentKeep;
+     @Autowired
+     private AlibabaExcel alibabaExcel;
+	 public void service(int id,HttpServletResponse response) throws IOException {
+		 ArrayList<patent> patents=new ArrayList<patent>();
+		 patent patent=patentKeep.selectone(id);
+		 patents.add(patent);
+		// System.out.println("excel:\n"+patent);
+		 response.setContentType("application / vnd.ms-excel");
+		 response.addHeader("Content-Disposition", "attachment;filename="+URLEncoder.encode(patent.getCreateThing(),"utf-8")+".xls");
+		 alibabaExcel.get(response.getOutputStream(), patents);
+	 }
+}

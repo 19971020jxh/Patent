@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.patent.dao.jkeep3.UserLibrary">
+
+<!--      public List<word> selectAll()-->
+   <select id="selectAll" resultType="cn.edu.patent.pojo.word" >
+   	SELECT * FROM UserLibrary
+   </select> 
+<!--    public List<word> selectPage(int pagenow,int limit)-->
+  <select id="selectPage"  resultType="cn.edu.patent.pojo.word" >
+<!--  	<bind name="pageNum" value="pageNow-1"></bind-->
+  	SELECT * FROM UserLibrary 
+  	<if test="searchWhat!=null and searchWhat!=''">
+  		WHERE content LIKE CONCAT('%',#{searchWhat},'%') or
+  		      weight LIKE CONCAT('%',#{searchWhat},'%') or
+  		      type LIKE CONCAT('%',#{searchWhat},'%') or
+  		      part_of_speech LIKE CONCAT('%',#{searchWhat},'%')
+  	</if>
+  	limit #{pageNow},#{pageSize}
+  </select>
+<!--  public int count()-->
+  <select id="count"  resultType="_int" >
+  	SELECT COUNT(id) FROM UserLibrary
+  </select>
+<!--      public void update(word word),IGNORE,防止重复插入-->
+     <update id="update" parameterType="cn.edu.patent.pojo.word" keyProperty="id" >
+     	UPDATE IGNORE  UserLibrary
+     	<set>
+     	<if test="content != null">
+     content=	#{content,jdbcType=VARCHAR,javaType=String},
+     	</if>
+     	<if test="weight !=null">
+     weight=	#{weight,jdbcType=INTEGER,javaType=int},
+     	</if>
+     	<if test="type !=null">
+     type=	#{type,jdbcType=VARCHAR,javaType=String},
+     	</if>
+     	<if test="partOfSpeech !=null">
+     part_of_speech=	#{partOfSpeech,jdbcType=VARCHAR,javaType=String}
+     	</if>
+     	</set>
+     	WHERE id=#{id}
+     </update>
+<!--      public void delete(String content)-->
+    <delete id="delete" parameterType="cn.edu.patent.pojo.word" >
+    	DELETE FROM UserLibrary WHERE id=#{id}
+    </delete>
+<!--      public void insertBatch(List<word> words)-->
+      	<insert id="insertBatch" parameterType="java.util.List" >
+      		REPLACE  INTO UserLibrary
+      		<trim prefix="(" suffix=")" suffixOverrides=",">
+		 	     content,
+		 	     weight,
+		 	     type,
+		 	     part_of_speech,
+		 	</trim>	
+      		VALUES
+      		<foreach collection="words" item="word" separator="," >
+      			<trim prefix="(" suffix=")" suffixOverrides=",">
+			 			#{word.content,jdbcType=VARCHAR,javaType=String},
+      			<choose>
+      				<when test="word.weight!=null" >
+      					#{word.weight,jdbcType=INTEGER,javaType=int},
+      				</when>
+      				<otherwise>
+      					weight,
+      				</otherwise>
+      			</choose>
+			 	<choose>
+      				<when test="word.type!=null" >
+      					#{word.type,jdbcType=VARCHAR,javaType=String},
+      				</when>
+      				<otherwise>
+      					type,
+      				</otherwise>
+      			</choose>
+			 	<choose>
+      				<when test="word.partOfSpeech!=null" >
+      					#{word.partOfSpeech,jdbcType=VARCHAR,javaType=String}
+      				</when>
+      				<otherwise>
+      					 part_of_speech,
+      				</otherwise>
+      			</choose>
+			 	</trim>
+      		</foreach>
+      	</insert>
+<!--      public void insert(word word);词重复时，会替换原来的，注意如果两个词相同但属于不同类别，后来的会替换原来的，我在content上加了唯一索引-->
+ <insert id="insert" parameterType="cn.edu.patent.pojo.word" >
+ 	REPLACE  INTO UserLibrary
+ 	<trim prefix="(" suffix=")" suffixOverrides=",">
+ 	     content,
+ 		<if test="weight!=null">
+ 	     weight,
+ 		</if>
+ 		<if test="type!=null">
+ 	     type,
+ 		</if>
+ 		<if test="partOfSpeech!=null">
+ 	     part_of_speech,
+ 		</if>
+ 	</trim>	
+ 		 VALUES
+ 	<trim prefix="(" suffix=")" suffixOverrides=",">
+ 			#{content},
+ 		<if test="weight!=null" >
+ 			#{weight},
+ 		</if>
+ 		<if test="type!=null" >
+ 			#{type},
+ 		</if>
+ 		<if test="partOfSpeech!=null" >
+ 			#{partOfSpeech},
+ 		</if>
+ 	</trim>
+ </insert>
+ 
+<!-- public HashSet<String> existBatch(Set<String> words)-->
+ <select id="existBatch" parameterType="java.util.Set" resultType="String" >
+ 	<if test="contents!=null and contents.size &gt; 0" >
+	 	<foreach collection="contents" item="content" separator="UNION" >
+	 	SELECT CONCAT(content,'/',part_of_speech) FROM UserLibrary WHERE CONCAT(content,'/',part_of_speech) = #{content}
+	 	</foreach>	
+ 	</if>
+ </select>
+</mapper>	

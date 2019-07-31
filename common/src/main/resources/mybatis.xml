@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD COnfig 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+ 
+<configuration>
+
+<settings>
+<setting name="logImpl" value="LOG4J2" />	
+<setting name="cacheEnabled" value="true"></setting>
+<setting name="lazyLoadingEnabled" value="true"></setting>
+<setting name="aggressiveLazyLoading" value="false"></setting>
+ <setting name="mapUnderscoreToCamelCase" value="true" />  
+</settings>    
+
+<typeHandlers>
+<typeHandler handler="cn.edu.patent.util.LisStringHandler"/>
+<typeHandler handler="cn.edu.patent.util.SetStringHandler"/>
+</typeHandlers>
+
+
+
+</configuration>

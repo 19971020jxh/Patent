@@ -1,0 +1,161 @@
+package patentImport.util;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import org.apache.logging.log4j.Level;
+import org.springframework.stereotype.Component;
+
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @author:JXH
+ * @date:2019年3月27日-下午3:41:13 zip操作等工具类
+ */
+@Log4j2
+@Component
+public class zipUtil {
+
+	private static final int buffer = 2048;
+
+	/**
+	 * 解压Zip文件
+	 * 
+	 * @param path 文件目录
+	 */
+	public String unZip(String path) {
+		int count = -1;
+		String savepath = "";
+
+		File file = null;
+		InputStream is = null;
+		FileOutputStream fos = null;
+		BufferedOutputStream bos = null;
+
+		savepath = path.substring(0, path.lastIndexOf(".")) + File.separator; // 保存解压文件目录
+		new File(savepath).mkdir(); // 创建保存目录
+		ZipFile zipFile = null;
+		try {
+			zipFile = new ZipFile(path, Charset.forName("UTF-8")); // 解决中文乱码问题
+			Enumeration<?> entries = zipFile.entries();
+
+			while (entries.hasMoreElements()) {
+				byte buf[] = new byte[buffer];
+
+				ZipEntry entry = (ZipEntry) entries.nextElement();
+
+				String filename = entry.getName();
+				boolean ismkdir = false;
+				if (filename.lastIndexOf("/") != -1) { // 检查此文件是否带有文件夹
+					ismkdir = true;
+				}
+				filename = savepath + filename;
+
+				if (entry.isDirectory()) { // 如果是文件夹先创建
+					file = new File(filename);
+					file.mkdirs();
+					continue;
+				}
+				file = new File(filename);
+				if (!file.exists()) { // 如果是目录先创建
+					if (ismkdir) {
+						new File(filename.substring(0, filename.lastIndexOf("/"))).mkdirs(); // 目录先创建
+					}
+				}
+				if (file.getParentFile() != null && !file.getParentFile().exists()) {
+				    file.getParentFile().mkdirs();
+				}
+				file.createNewFile(); // 创建文件
+
+				is = zipFile.getInputStream(entry);
+				fos = new FileOutputStream(file);
+				bos = new BufferedOutputStream(fos, buffer);
+
+				while ((count = is.read(buf)) > -1) {
+					bos.write(buf, 0, count);
+				}
+				bos.flush();
+				bos.close();
+				fos.close();
+
+				is.close();
+			}
+
+			zipFile.close();
+
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} finally {
+			try {
+				if (bos != null) {
+					bos.close();
+				}
+				if (fos != null) {
+					fos.close();
+				}
+				if (is != null) {
+					is.close();
+				}
+				if (zipFile != null) {
+					zipFile.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return savepath;
+	}
+
+	/**
+	 * 解压多个zip,返回解压后包集合路径
+	 * 
+	 * @param paths
+	 * @return
+	 */
+	public ArrayList<String> allunzip(ArrayList<String> paths) {
+		ArrayList<String> list = new ArrayList<String>();
+		// System.out.println("paths:"+paths);
+		for (String path : paths) {
+			log.log(Level.forName("work", 50), "path:" + path);
+			list.add(unZip(path));
+		}
+		return list;
+	}
+
+	/**
+	 * 获取路径下全部zip,文件,能递归文件夹！
+	 * 
+	 * @param path
+	 * @return ArrayList<File>
+	 */
+	public ArrayList<String> allzip(String path, ArrayList<String> zipList) {
+		log.log(Level.forName("work", 50), "获取" + path + "路径下的专利zip");
+		File file = new File(path);
+		return printFile(file,zipList);
+	}
+
+	private ArrayList<String> printFile(File file, ArrayList<String> zipList) {
+		File[] arr = file.listFiles();
+
+		for (File f : arr) {
+			if (f.isFile() && f.getName().endsWith(".zip")) {
+				zipList.add(f.getPath());
+				log.log(Level.forName("work", 50), "专利压缩包:" + f.getName() + " url:" + f.getPath());
+			}else if(f.isDirectory()) {//如果是文件夹，递归寻找！ 
+				 printFile(f,zipList); 
+			}
+			
+		}
+		return zipList;
+	}
+	
+}

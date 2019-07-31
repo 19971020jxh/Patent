@@ -1,0 +1,51 @@
+package cn.edu.patent.service;
+
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import cn.edu.patent.dao.jkeep3.patentKeep;
+import cn.edu.patent.lucene.insertIndex;
+import cn.edu.patent.pojo.patent;
+
+/**
+ * @author:JXH
+ * @date:2019年4月8日-下午2:34:16
+ * 添加专利服务，(压缩包上传添加，网页手动添加)
+ */
+@Component
+public class insertService {
+	@Autowired
+	private patentKeep patentKeep;
+	@Autowired
+	private insertIndex insertIndex;
+	
+       /**
+        * 手动添加！一次只能添加一条
+        * <br/>1.加进数据库
+        * <br/>2.加入lucene索引 
+     * @throws IOException 
+        */
+	 @Transactional
+	 public patent insertBySelfService(patent patent) throws IOException {
+		 patentKeep.insert_patent(patent);
+		 insertIndex.selfIndex(patent);
+		 return patent;
+	 }
+	 /**
+	  * zip包添加，在{@link Import.patentImport.jkeep3.patentKeepimpl}中
+	 * @throws IOException 
+	  */
+	 @Transactional
+	 public void batchOfZip(patent patent) throws IOException {
+		//还没,检测重复,重复专利不添加!
+			if (!patentKeep.exist(patent.getRequestNumber())) {
+				//先查询存不存在,已经存在的专利不添加,根据申请号判断!
+				patentKeep.insert_patent(patent);//添加进数据库
+				insertIndex.zipIndex(patent); //添加索引
+			}
+		
+	 }
+}

@@ -1,0 +1,13 @@
+package patentweb.controller;
+
+import org.springframework.web.bind.annotation.ControllerAdvice;
+
+/**
+ * @author:JXH
+ * @date:2019年4月12日-上午11:09:13
+ * 全局异常处理！
+ */
+@ControllerAdvice
+public class ExceptionController {
+
+}
