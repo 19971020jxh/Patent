@@ -54,6 +54,8 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @Log4j2
 public class luceneUtil {
+	private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager.getLogger(luceneUtil.class);
+
 	/**
 	 * 默认搜索域
 	 */
@@ -102,6 +104,10 @@ public class luceneUtil {
 	    	//ansj-分词
 	    	 // 关键字词典,停用词字典
 			   String url=request.getServletContext().getResource(File.separator).getPath();
+			  System.out.println(url);
+			   if (System.getProperty("os.name").toLowerCase().startsWith("win")  && indexpackage.startsWith("/")) {
+				   url=url.substring(1, url.length());
+			   }
 			   log.log(Level.forName("work", 50), "url-getPath:"+url);
 			   File dicFile=new File(url+"Dictionary");
 			   if (!dicFile.exists()) {
@@ -182,10 +188,12 @@ public class luceneUtil {
 			 if (!indexFile.exists()) {
 				indexFile.mkdir();
 			 }
+			 System.out.println(indexpackage);
 			 // window操作系统处理
-			 if (System.getProperty("os.name").startsWith("win")) {
+			 if (System.getProperty("os.name").toLowerCase().startsWith("win") && indexpackage.startsWith("/")) {
 				indexpackage=indexpackage.substring(1, indexpackage.length());
 			 }
+			 System.out.println(indexpackage);
 			// window操作系统处理
 	    	 Directory directory=FSDirectory.open(Paths.get(indexpackage));
 	    	 //新建一个分词器,为什么不永if(!=null),为了保证每次都是最新的

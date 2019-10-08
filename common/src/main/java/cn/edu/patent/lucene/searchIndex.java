@@ -90,7 +90,7 @@ public class searchIndex extends luceneUtil{
 log.log(Level.forName("work", 50),"创造IndexSearcher，indexpackage的url:"+url);	 
 	      }
 		   // window操作系统处理
-			 if (System.getProperty("os.name").startsWith("win")) {
+			 if (System.getProperty("os.name").toLowerCase().startsWith("win") && indexpackage.startsWith("/")) {
 				indexpackage=indexpackage.substring(1, indexpackage.length());
 			 }
 			// window操作系统处理
@@ -245,10 +245,13 @@ log.log(Level.forName("work", 50),"创造IndexSearcher，indexpackage的url:"+ur
    		 String url=request.getServletContext().getResource(File.separator).getPath();
    		 indexpackage=url+"indexpackage";
         }
+		 System.out.println(indexpackage);
+		 System.out.println(System.getProperty("os.name"));
 		// window操作系统处理---有待考究
-		 if (System.getProperty("os.name").startsWith("win")) {
+		 if (System.getProperty("os.name").toLowerCase().startsWith("win")  && indexpackage.startsWith("/")) {
 			indexpackage=indexpackage.substring(1, indexpackage.length());
 		 }
+		 System.out.println(indexpackage);
 		// window操作系统处理
 		Directory directory=FSDirectory.open(Paths.get(indexpackage));
 		IndexReader reader=DirectoryReader.open(directory);

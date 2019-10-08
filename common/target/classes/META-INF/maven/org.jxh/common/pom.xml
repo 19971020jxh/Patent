@@ -46,12 +46,11 @@
 	    <version>6.6</version>
 	</dependency> -->
 	
-	
 	<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-common -->
 	<dependency>
 	    <groupId>org.apache.lucene</groupId>
 	    <artifactId>lucene-analyzers-common</artifactId>
-	    <version>6.6</version>
+	    <version>6.6.6</version>
 	</dependency>
 	
 	<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queryparser -->

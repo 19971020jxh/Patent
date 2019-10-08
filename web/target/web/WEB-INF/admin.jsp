@@ -43,7 +43,7 @@
 				    </span>
 				    专利信息
 				  </a>
-				   <a class="panel-block" onclick="a_active(this)">
+				   <a class="panel-block" onclick="a_active(this)" href="<%=request.getContextPath()%>/dictionary/jsp" >
 				    <span class="panel-icon">
 				      <!-- <i class="fas fa-book"></i> -->
 				    </span>

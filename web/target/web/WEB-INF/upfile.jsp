@@ -41,8 +41,8 @@
  <div class="layui-form-item">
     <label style="width:auto;padding:9px 0px;" class="layui-form-label">上传方式</label>
     <div class="layui-input-block" style="margin-left: 70px;">
-      <input type="radio" name="radio" value="files" title="批量" checked>
-      <input type="radio" name="radio" value="file" title="单个" >
+      <input type="radio" name="radio" value="files" title="批量" >
+      <input type="radio" name="radio" value="file" title="单个" checked>
     </div>
   </div>
 </form>  

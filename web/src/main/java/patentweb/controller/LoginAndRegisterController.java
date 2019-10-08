@@ -31,6 +31,7 @@ public class LoginAndRegisterController {
 	}
 	@RequestMapping("login/page")
 	public String loginPage() {
+		log.info("-跳往登录页面-");
 		return "login";
 	}
 

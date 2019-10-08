@@ -93,8 +93,8 @@ public class FileUploadController {
 				//-上传次数+1
 				userdao.addOneUp(user.getId());
 			}catch(Exception e) {
-				log.log(Level.forName("work",50),e.getMessage());
-				result.put("workinfo", e.getMessage());
+			log.log(Level.forName("work",50),e.getMessage());
+			result.put("workinfo", e.getMessage());
 				//e.printStackTrace();
 			}
 		}

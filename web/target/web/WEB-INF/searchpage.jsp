@@ -92,7 +92,7 @@
 </div>
 <div class="layui-input-inline" style="float:right;">
 <a class="layui-btn" href="insertpage" >➕<span>添加</span></a>
-</div>admin/out
+</div>
 
 </div>
 <div id="jingque" class="layui-row" style="display:none;margin-right:15px;margin-left:-42px;padding-top:15px;">

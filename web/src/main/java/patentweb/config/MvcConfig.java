@@ -25,7 +25,8 @@ public class MvcConfig {
 	@Bean
 	public InternalResourceViewResolver JspView() {
 		InternalResourceViewResolver jViewResolver=new InternalResourceViewResolver();
-		jViewResolver.setPrefix(File.separator+"WEB-INF"+File.separator);
+		//jViewResolver.setPrefix(File.separator+"WEB-INF"+File.separator);
+		jViewResolver.setPrefix("/"+"WEB-INF"+"/");
 		jViewResolver.setSuffix(".jsp");
 		
 		return jViewResolver;

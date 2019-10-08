@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
  * 请求参数-本地不乱码，服务器乱码，改成服务器不乱码后，本地又乱码，<br/>
  * linux不乱码，win又乱码.
  */
+
 @ControllerAdvice
 @Log4j2
 public class EncodingControlleradvice {

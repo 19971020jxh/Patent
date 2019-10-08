@@ -37,6 +37,8 @@ import lombok.extern.log4j.Log4j2;
 public class insertIndex extends luceneUtil{
 	@Autowired
     private patentKeep patentKeep;
+	private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager.getLogger(insertIndex.class);
+
 	
 
     /**
